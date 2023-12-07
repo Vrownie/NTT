@@ -1,0 +1,10 @@
+module PE( 
+	input clk, reset,
+	input data_i, start,
+	input twiddle_i,
+	output ntt_o
+);
+
+	logic [(`DATA_SIZE_ARB*2)-1:0] data_tw;
+	
+	
