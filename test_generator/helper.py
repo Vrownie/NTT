@@ -16,7 +16,7 @@
 
 import math
 
-DEBUG_MODE_NTT  = 0
+DEBUG_MODE_NTT  = 1
 DEBUG_MODE_INTT = 0
 
 # Modular inverse (https://stackoverflow.com/questions/4798654/modular-multiplicative-inverse-function-in-python)
