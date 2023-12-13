@@ -16,8 +16,8 @@
 
 import math
 
-DEBUG_MODE_NTT  = 0
-DEBUG_MODE_INTT = 0
+DEBUG_MODE_NTT = 1
+DEBUG_MODE_INTT = 1
 
 # Modular inverse (https://stackoverflow.com/questions/4798654/modular-multiplicative-inverse-function-in-python)
 def egcd(a, b):
@@ -52,8 +52,8 @@ def indexReverse(a,r):
 def IterativeForwardNTT(arrayIn, P, W, R):
     #########################################################
     if DEBUG_MODE_NTT:
-        A_ntt_interm_1 = open("NTT_DIN_DEBUG_1.txt","w") # Just result
-        A_ntt_interm_2 = open("NTT_DIN_DEBUG_2.txt","w") # BTF inputs
+        A_ntt_interm_1 = open("test/NTT_DIN_DEBUG_1.txt","w") # Just result
+        A_ntt_interm_2 = open("test/NTT_DIN_DEBUG_2.txt","w") # BTF inputs
     #########################################################
 
     arrayOut = [0] * len(arrayIn)

@@ -23,13 +23,13 @@ from helper import *
 # Test Generator for N-pt NTT/INTT with P Processing Element
 
 # -------------------------------------------------------------------------- TXT
-PRM_TXT       = open("PARAM.txt","w")
-NTT_DIN_TXT   = open("NTT_DIN.txt","w")
-NTT_DOUT_TXT  = open("NTT_DOUT.txt","w")
-INTT_DIN_TXT  = open("INTT_DIN.txt","w")
-INTT_DOUT_TXT = open("INTT_DOUT.txt","w")
-W_TXT         = open("W.txt","w")
-WINV_TXT      = open("WINV.txt","w")
+PRM_TXT       = open("test/PARAM.txt","w")
+NTT_DIN_TXT   = open("test/NTT_DIN.txt","w")
+NTT_DOUT_TXT  = open("test/NTT_DOUT.txt","w")
+INTT_DIN_TXT  = open("test/INTT_DIN.txt","w")
+INTT_DOUT_TXT = open("test/INTT_DOUT.txt","w")
+W_TXT         = open("test/W.txt","w")
+WINV_TXT      = open("test/WINV.txt","w")
 # -------------------------------------------------------------------------- TXT
 
 # Pre-defined parameter set
