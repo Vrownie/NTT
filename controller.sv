@@ -12,6 +12,7 @@ module contoller(
     //Number of operations before final stage outputs
     //logic [`DATA_SIZE_ARB-1:0] last_stage_count = RING_SIZE*($clog2(`RING_SIZE)-1);
     logic [11:0] stage_count = 1;
+    logic [ $clog2(`RING_SIZE) : 0] stage;
     logic temp_sel_a, temp_sel_b, temp_sel_ram;
 
     typedef enum {idle=0, mux_1=1, mux_2=2} state;

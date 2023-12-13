@@ -35,7 +35,7 @@ module PE(
                .A(data_i),.B(twiddle_i),
                .q(q), .C(mult_out));
 	
-	shift_reg #(13, 13) delay_input(
+	shift_reg #(13, 12) delay_input(
 	.clk(clk), .reset(reset),
 	.data_i(data_i), .data_o(data_i_shifted)
 );
