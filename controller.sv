@@ -7,12 +7,13 @@ module contoller(
     output [11:0] stage
 );
     localparam  delay = 11;
+    localparam delay_2 =`INTMUL_DELAY + `MODRED_DELAY;
     logic [7:0] counter = 8'b0, delay_count = 0;
 
     //Number of operations before final stage outputs
-    //logic [`DATA_SIZE_ARB-1:0] last_stage_count = RING_SIZE*($clog2(`RING_SIZE)-1);
-    logic [11:0] stage_count = 1;
-    logic [ $clog2(`RING_SIZE) : 0] stage;
+    //logic [`DATA_SIZE_ARB-1:0] last_temp_stage = RING_SIZE*($clog2(`RING_SIZE)-1);
+    logic [11:0] temp_stage = 1;
+    logic [ $clog2(`RING_SIZE) : 0] stage_counter;
     logic temp_sel_a, temp_sel_b, temp_sel_ram;
 
     typedef enum {idle=0, mux_1=1, mux_2=2} state;
@@ -30,7 +31,7 @@ module contoller(
             idle: begin
                 temp_sel_a = 1'b1;
                 temp_sel_b = 1'b1;
-                if (delay_count == delay)
+                if (delay_count == delay_2 )
                     next_state = mux_1;
             end
 
@@ -38,7 +39,7 @@ module contoller(
                 temp_sel_a = 1'b1;
                 temp_sel_b = 1'b0;
                 //One clock cycle after all calculations are completed return to idle state
-                //if (counter == last_stage_count + `RING_SIZE/2 +1)
+                //if (counter == last_temp_stage + `RING_SIZE/2 +1)
                 next_state = mux_2;
             end
 
@@ -58,6 +59,7 @@ module contoller(
         //Select Ram input from Bit_reverse fr
         if (counter >= `RING_SIZE/2)
             temp_sel_ram = 1'b0;
+            
         else 
             temp_sel_ram = 1'b1;    
     end
@@ -67,17 +69,17 @@ module contoller(
             counter <= counter + 1'b1;
             delay_count <= delay_count + 1'b1;
             //While not on last stage count half of inputs
-            if (stage_count < $clog2(`RING_SIZE)) begin
+            if (temp_stage < $clog2(`RING_SIZE)) begin
                 if (counter >= `RING_SIZE/2-1)
                    counter <= 0;
                 if (counter == `RING_SIZE/2-1)
-                    stage_count <= stage_count + 1'b1;
+                    temp_stage <= temp_stage + 1'b1;
             end
             //When in final stage after final output reset counter and stage count
             else begin
                 if (counter >= `RING_SIZE-1) begin
                     counter <= 0;
-                    stage_count <= 0;
+                    temp_stage <= 0;
                 end
             end
         end

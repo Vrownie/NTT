@@ -34,13 +34,13 @@ bit_reverse bit_rev(
 
 contoller control_unit( 
     .clk(clk), .reset(reset),
-    .start(valid),
+    .start(start),
     .sel_a(sel_a), .sel_b(sel_b), .sel_ram(sel_ram),
     .stage(stage)
 );
 
 PE Pe1(.clk(clk), .reset(reset),
-	.start(valid), .sel_a(sel_a), .sel_b(sel_b),
+	.start(start), .sel_a(sel_a), .sel_b(sel_b),
 	.q(q), .data_i(NTTin0),
 	.twiddle_i(twiddle), .ntt_o(ntt_o)
 );
@@ -72,8 +72,10 @@ always #(2) clk = ~clk;
 always @(posedge clk) begin
 	if (reset == 1'b0) begin
 		valid <= 1'b1;
-		$fscanf(fh_in,"%d \n",NTTin0);
-		$fscanf(tw_in,"%d \n",twiddle);
+		if (start == 1'b1) begin
+			$fscanf(fh_in,"%d \n",NTTin0);
+			$fscanf(tw_in,"%d \n",twiddle);
+		end
     	
       	index <= index+1;
         

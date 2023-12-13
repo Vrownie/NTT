@@ -16,12 +16,17 @@ module bit_reverse   (
 	always_ff @(posedge clk) begin
 		if (reset) begin
 			count <= {$clog2(`RING_SIZE){1'b0}};
+			temp_done = 1'b0;
 		end
 		else begin
 			if (valid) begin
 				count <= count + 1'b1;
 			end
 		end
+
+		//All entries stored
+		if (count >= `RING_SIZE - 1)
+			temp_done = 1'b1;
 	end
 	
    	always_comb begin
@@ -46,10 +51,6 @@ module bit_reverse   (
 			temp_ram1 = 1'b0;
 			temp_ram2 = 1'b0;
 		end
-		
-		//All entries stored
-		if (count == `RING_SIZE)
-			temp_done = 1'b1;
 	end
 	
 	
