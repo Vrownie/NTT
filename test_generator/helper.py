@@ -18,6 +18,7 @@ import math
 
 DEBUG_MODE_NTT = 1
 DEBUG_MODE_INTT = 1
+DEBUG_MODE_6950 = 1
 
 # Modular inverse (https://stackoverflow.com/questions/4798654/modular-multiplicative-inverse-function-in-python)
 def egcd(a, b):
@@ -54,6 +55,9 @@ def IterativeForwardNTT(arrayIn, P, W, R):
     if DEBUG_MODE_NTT:
         A_ntt_interm_1 = open("test/NTT_DIN_DEBUG_1.txt","w") # Just result
         A_ntt_interm_2 = open("test/NTT_DIN_DEBUG_2.txt","w") # BTF inputs
+    if DEBUG_MODE_6950:
+        A_ntt_interm_3 = open("test/6950_PE_SANITY.txt","w")
+        A_ntt_interm_3.write("top_in,bot_in,twiddle,top_out,bot_out\n")
     #########################################################
 
     arrayOut = [0] * len(arrayIn)
@@ -95,6 +99,9 @@ def IterativeForwardNTT(arrayIn, P, W, R):
                 #########################################################
                 if DEBUG_MODE_NTT:
                     A_ntt_interm_2.write((str(s)+" "+str(t)+" "+str(((2 ** i) * k))).ljust(16)+"("+str(as_temp).ljust(12)+" "+str(at_temp).ljust(12)+" "+str((w*R) % P).ljust(12)+") -> ("+str(arrayOut[s]).ljust(12)+" "+str(arrayOut[t]).ljust(12)+")"+"\n")
+                if DEBUG_MODE_6950 and i == v-1:
+                    to_write_list = [as_temp, at_temp, w, arrayOut[s], arrayOut[t]]
+                    A_ntt_interm_3.write(",".join([str(x) for x in to_write_list])+"\n")
                 #########################################################
 
         #########################################################
@@ -116,6 +123,7 @@ def IterativeForwardNTT(arrayIn, P, W, R):
     if DEBUG_MODE_NTT:
         A_ntt_interm_1.close()
         A_ntt_interm_2.close()
+        A_ntt_interm_3.close()
     #########################################################
 
     return arrayOut

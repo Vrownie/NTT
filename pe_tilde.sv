@@ -3,22 +3,16 @@
 module PE_Tilde( 
 	input clk, reset,
 	input start,
-	input [`DATA_SIZE_ARB-1:0] q, data_i,
-	input [`DATA_SIZE_ARB-1:0] twiddle_i,
-	output [`DATA_SIZE_ARB-1:0] ntt_o
+	input [`DATA_SIZE_ARB-1:0] q, data_top_i, data_bot_i, twiddle_i,
+	output logic [`DATA_SIZE_ARB-1:0] ntt_top_o, ntt_bot_o
 );
-
-	logic [`DATA_SIZE_ARB-1:0] mux1_out, mux2_out, mult_out, data_i_shifted;
-	logic [`DATA_SIZE_ARB-1:0] even_out, odd_out;
-	logic sel_a, sel_b;
-
 
 	// modular add
 	logic        [`DATA_SIZE_ARB  :0] madd;
 	logic signed [`DATA_SIZE_ARB+1:0] madd_q;
 	logic        [`DATA_SIZE_ARB-1:0] madd_res;
 
-	assign madd     = mux1_out + odd_out;
+	assign madd     = data_top_i + data_bot_i;
 	assign madd_q   = madd - q;
 	assign madd_res = (madd_q[`DATA_SIZE_ARB+1] == 1'b0) ? madd_q[`DATA_SIZE_ARB-1:0] : madd[`DATA_SIZE_ARB-1:0];
 
@@ -26,54 +20,44 @@ module PE_Tilde(
 	logic        [`DATA_SIZE_ARB  :0] msub;
 	logic signed [`DATA_SIZE_ARB+1:0] msub_q;
 	logic        [`DATA_SIZE_ARB-1:0] msub_res;
-	logic 		 [5:0] counter = 6'b0;
 
-	assign msub     = mux1_out - odd_out;
+	assign msub     = data_top_i - data_bot_i;
 	assign msub_q   = msub + q;
 	assign msub_res = (msub[`DATA_SIZE_ARB] == 1'b0) ? msub[`DATA_SIZE_ARB-1:0] : msub_q[`DATA_SIZE_ARB-1:0];
 
-	
-	ModMult mult(.clk(clk),.reset(reset),
-               .A(data_i),.B(twiddle_i),
-               .q(q), .C(mult_out));
-	
-	shift_reg #(13, 7) delay_input(
-	.clk(clk), .reset(reset),
-	.data_i(data_i), .data_o(data_i_shifted)
-	);
-					
+	// inferred registers
+	logic [`DATA_SIZE_ARB-1:0] twiddle_q, msub_res_q, madd_res_q;
+
 	always_ff @(posedge clk) begin
-		if (start) begin
-			sel_a <= ~(sel_a);
-			counter <= counter + 1'b1;
+		if (reset) begin
+			twiddle_q  <= 0;
+			msub_res_q <= 0;
+			madd_res_q <= 0;
+		end else begin
+			twiddle_q  <= twiddle_i;
+			msub_res_q <= msub_res;
+			madd_res_q <= madd_res;
 		end
-
 	end
+
+	logic [`DATA_SIZE_ARB-1:0] mult_out;
+	ModMult mult (
+		.clk(clk), .reset(reset),
+        .A(twiddle_q), .B(msub_res_q),
+        .q(q), .C(mult_out)
+	);
 	
-	always_comb begin
-		/*Mux one*/
-		if (sel_a) 
-			mux1_out = mult_out;
-		else
-			mux1_out = data_i_shifted;
-			
-		/*Mux two*/
-		if (sel_b) 
-			mux2_out = even_out;
-		else
-			mux2_out = msub_res;
-			
-	end
+	logic [`DATA_SIZE_ARB-1:0] delayed_add_out;
+	shift_reg #(
+		.STAGES(`INTMUL_DELAY + `MODRED_DELAY),
+		.WIDTH(`DATA_SIZE_ARB)
+	) delay_input (
+		.clk(clk), .reset(reset),
+		.data_i(madd_res_q), .data_o(delayed_add_out)
+	);
 
-	/**********************************************************************/
-
-	
-	always_ff @(posedge clk) begin
-		odd_out <= mux1_out;
-		even_out <= madd_res;
-	end
+	// infer another reg for bot_out, top_out is fine
+	assign ntt_top_o = delayed_add_out;
+	assign ntt_bot_o = mult_out;
 
 endmodule
-			
-	
-	
