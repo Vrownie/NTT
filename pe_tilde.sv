@@ -2,8 +2,7 @@
 
 module PE_Tilde( 
 	input clk, reset,
-	input start,
-	input [`DATA_SIZE_ARB-1:0] q, data_top_i, data_bot_i, twiddle_i,
+	input [`DATA_SIZE_ARB-1:0] q, data_top_i, data_bot_i, 
 	output logic [`DATA_SIZE_ARB-1:0] ntt_top_o, ntt_bot_o
 );
 
@@ -25,39 +24,8 @@ module PE_Tilde(
 	assign msub_q   = msub + q;
 	assign msub_res = (msub[`DATA_SIZE_ARB] == 1'b0) ? msub[`DATA_SIZE_ARB-1:0] : msub_q[`DATA_SIZE_ARB-1:0];
 
-	// inferred registers
-	logic [`DATA_SIZE_ARB-1:0] twiddle_q, msub_res_q, madd_res_q;
-
-	always_ff @(posedge clk) begin
-		if (reset) begin
-			twiddle_q  <= 0;
-			msub_res_q <= 0;
-			madd_res_q <= 0;
-		end else begin
-			twiddle_q  <= twiddle_i;
-			msub_res_q <= msub_res;
-			madd_res_q <= madd_res;
-		end
-	end
-
-	logic [`DATA_SIZE_ARB-1:0] mult_out;
-	ModMult mult (
-		.clk(clk), .reset(reset),
-        .A(twiddle_q), .B(msub_res_q),
-        .q(q), .C(mult_out)
-	);
-	
-	logic [`DATA_SIZE_ARB-1:0] delayed_add_out;
-	shift_reg #(
-		.STAGES(`INTMUL_DELAY + `MODRED_DELAY),
-		.WIDTH(`DATA_SIZE_ARB)
-	) delay_input (
-		.clk(clk), .reset(reset),
-		.data_i(madd_res_q), .data_o(delayed_add_out)
-	);
-
-	// infer another reg for bot_out, top_out is fine
-	assign ntt_top_o = delayed_add_out;
-	assign ntt_bot_o = mult_out;
+	// ???
+	assign ntt_top_o = madd_res;
+	assign ntt_bot_o = msub_res;
 
 endmodule

@@ -4,17 +4,15 @@ module ntt_tb();
 
 `include "defines.v"
 
-logic clk, reset, start;
+logic clk, reset;
 logic [`DATA_SIZE_ARB-1:0] q, data_top_i, data_bot_i, twiddle_i;
 logic [`DATA_SIZE_ARB-1:0] ntt_top_o, ntt_bot_o; 
 
 integer fh_in, fh_out, index;
 
 PE_Tilde dut(
-    .clk(clk), .reset(reset),
-    .start(start),
-    .q(q), .data_top_i(data_top_i), 
-    .data_bot_i(data_bot_i), .twiddle_i(twiddle_i),
+    .clk(clk), .reset(reset), .q(q), 
+    .data_top_i(data_top_i), .data_bot_i(data_bot_i), 
     .ntt_top_o(ntt_top_o), .ntt_bot_o(ntt_bot_o)
 );
 
@@ -24,11 +22,9 @@ PE_Tilde dut(
 //   fh_out = $fopen("pe_tilde_sanity.txt","w");
 // end
 
-assign start = 1'b1; // currently unused
 assign q = `DATA_SIZE_ARB'h1e01;
-assign data_top_i = `DATA_SIZE_ARB'd3046;
-assign data_bot_i = `DATA_SIZE_ARB'd2769;
-assign twiddle_i = `DATA_SIZE_ARB'd1853;
+assign data_top_i = `DATA_SIZE_ARB'd1147;
+assign data_bot_i = `DATA_SIZE_ARB'd2963;
 
 // Set intial values and reset the module
 initial begin

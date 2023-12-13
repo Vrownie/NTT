@@ -100,7 +100,7 @@ def IterativeForwardNTT(arrayIn, P, W, R):
                 if DEBUG_MODE_NTT:
                     A_ntt_interm_2.write((str(s)+" "+str(t)+" "+str(((2 ** i) * k))).ljust(16)+"("+str(as_temp).ljust(12)+" "+str(at_temp).ljust(12)+" "+str((w*R) % P).ljust(12)+") -> ("+str(arrayOut[s]).ljust(12)+" "+str(arrayOut[t]).ljust(12)+")"+"\n")
                 if DEBUG_MODE_6950 and i == v-1:
-                    to_write_list = [as_temp, at_temp, w, arrayOut[s], arrayOut[t]]
+                    to_write_list = [as_temp, at_temp, (w*R) % P, arrayOut[s], arrayOut[t]]
                     A_ntt_interm_3.write(",".join([str(x) for x in to_write_list])+"\n")
                 #########################################################
 
