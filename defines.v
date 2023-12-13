@@ -22,8 +22,8 @@ limitations under the License.
 // -- n: RING_SIZE
 // -- B: PE_NUMBER
 
-`define DATA_SIZE_ARB   14
-`define RING_SIZE       512
+`define DATA_SIZE_ARB   13
+`define RING_SIZE       8
 `define PE_NUMBER       1
 
 // ------------------------------------------------

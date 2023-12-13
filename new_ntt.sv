@@ -2,7 +2,7 @@
 
 module PE( 
 	input clk, reset,
-	input start,
+	input start, sel_a, sel_b,
 	input [`DATA_SIZE_ARB-1:0] q, data_i,
 	input [`DATA_SIZE_ARB-1:0] twiddle_i,
 	output [`DATA_SIZE_ARB-1:0] ntt_o
@@ -10,8 +10,6 @@ module PE(
 
 	logic [`DATA_SIZE_ARB-1:0] mux1_out, mux2_out, mult_out, data_i_shifted;
 	logic [`DATA_SIZE_ARB-1:0] even_out, odd_out;
-	logic sel_a, sel_b;
-
 
 	// modular add
 	logic        [`DATA_SIZE_ARB  :0] madd;
@@ -37,18 +35,18 @@ module PE(
                .A(data_i),.B(twiddle_i),
                .q(q), .C(mult_out));
 	
-	shift_reg #(13, 7) delay_input(
+	shift_reg #(13, 13) delay_input(
 	.clk(clk), .reset(reset),
 	.data_i(data_i), .data_o(data_i_shifted)
 );
 					
-	always_ff @(posedge clk) begin
+	/*always_ff @(posedge clk) begin
 		if (start) begin
 			sel_a <= ~(sel_a);
+			sel_b <= sel_a;
 			counter <= counter + 1'b1;
 		end
-
-	end
+	end*/
 	
 	always_comb begin
 		/*Mux one*/
@@ -59,19 +57,17 @@ module PE(
 			
 		/*Mux two*/
 		if (sel_b) 
-			mux2_out = even_out;
+			mux2_out = msub_res;		
 		else
-			mux2_out = msub_res;
-			
+			mux2_out = even_out;
 	end
-
-	/**********************************************************************/
-
+	assign ntt_o = mux2_out;
 	
 	always_ff @(posedge clk) begin
 		odd_out <= mux1_out;
 		even_out <= madd_res;
 	end
+
 
 endmodule
 			

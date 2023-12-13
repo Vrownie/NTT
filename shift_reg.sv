@@ -3,7 +3,7 @@
 module shift_reg #
 (
 	parameter WIDTH = 16,
-	parameter STAGES = 0
+	parameter STAGES = 1
 	)
 (
 	input clk, reset,
@@ -11,7 +11,7 @@ module shift_reg #
 	output [WIDTH-1:0] data_o
 );
 
-logic [WIDTH-1:0] temp_output, [STAGES-1:0];
+logic [WIDTH-1:0] temp_output [STAGES-1:0];
 
 always_ff @(posedge clk) begin
 	if (reset) 
@@ -32,6 +32,6 @@ generate
 	end
 endgenerate
 
-assign data_o = temp_output2;
+assign data_o = temp_output[STAGES-1];
 
 endmodule
