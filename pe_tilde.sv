@@ -24,8 +24,15 @@ module PE_Tilde(
 	assign msub_q   = msub + q;
 	assign msub_res = (msub[`DATA_SIZE_ARB] == 1'b0) ? msub[`DATA_SIZE_ARB-1:0] : msub_q[`DATA_SIZE_ARB-1:0];
 
-	// ???
-	assign ntt_top_o = madd_res;
-	assign ntt_bot_o = msub_res;
+	// inferred registers
+	always @(posedge clk) begin
+		if (reset) begin
+			ntt_top_o <= `DATA_SIZE_ARB'd0;
+			ntt_bot_o <= `DATA_SIZE_ARB'd0;
+		end else begin
+			ntt_top_o <= madd_res;
+			ntt_bot_o <= msub_res;
+		end
+	end
 
 endmodule

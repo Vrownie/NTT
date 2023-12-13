@@ -70,12 +70,12 @@ if PC:
 else:
     # Input parameters
     N, K = 256, 13
-    #N, K = 256, 23
-    #N, K = 512, 14
-    #N, K = 1024, 14
-    #N, K = 1024, 29
-    #N, K = 2048, 30
-    #N, K = 4096, 60
+    # N, K = 256, 23
+    # N, K = 512, 14
+    # N, K = 1024, 14
+    # N, K = 1024, 29
+    # N, K = 2048, 30
+    # N, K = 4096, 60
 
     while(1):
         q = generate_large_prime(K)
