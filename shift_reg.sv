@@ -3,8 +3,8 @@
 module shift_reg #
 (
 	parameter WIDTH = 16,
-	parameter STAGES = 0
-)
+	parameter STAGES = 1
+	)
 (
 	input clk, reset,
 	input [WIDTH-1:0] data_i,
