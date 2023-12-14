@@ -1,7 +1,8 @@
-module AddressGenerator (clk, rst, memAddress, wrMode);
+module AddressGenerator (clk, rst, memAddress, wrMode, done);
     parameter numStages = 8; //number of stages in the pipeline
     input clk;
     input rst;
+    input done;
     output [numStages - 1:0] memAddress; //address in memory being modified
     output wrMode; //is it write or read mode
     //output int pivot1;
@@ -23,7 +24,7 @@ module AddressGenerator (clk, rst, memAddress, wrMode);
             memAddress1 <= {1'b1,  {(numStages-1){1'b0}}};
             memAddress2 <= {(numStages){1'b0}};
         end
-        else begin //we are on clk
+        else if (done) begin //we are on clk
             if (internalCounter == 2'b11) begin //if we reach the end of the read/write cycle --> restart it
                 internalCounter <= 2'b00;
                 nextMemAddress2 <= memAddress2 + 1'b1; //increment the lower address
