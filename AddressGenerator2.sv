@@ -1,51 +1,38 @@
-module AddressGenerator (clk, rst, memAddress, wrMode, done);
+module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid);
     parameter numStages = 8; //number of stages in the pipeline
+    localparam delay = 11;
     input clk;
     input rst;
     input done;
-    output [numStages - 1:0] memAddress; //address in memory being modified
-    output wrMode; //is it write or read mode
-    //output int pivot1;
+    output reg [numStages - 1:0] rdAddress; //address in memory being modified
+    output reg [numStages - 1:0] wrAddress;
+    output reg wrValid;
+    //output wrMode;
 
-    //logic [numStages: 0] upperAddress, lowerAddress;
-    //logic [numStages - 1: 0] pivot = {1'b1,  {(numStages-1){1'b0}}};
-    logic [1:0] internalCounter = 2'b00;// use to keep track of which stage of read/write
+    logic internalCounter = 1'b0;
     int pivot = numStages-1;
     logic [numStages - 1: 0] memAddress1 = {1'b1,  {(numStages-1){1'b0}}}; //create the upper mem address
     logic [numStages - 1: 0] memAddress2 = {(numStages){1'b0}}; //create the lower mem address
     logic init = 1'b1;
     logic [numStages - 1: 0] memAddressHelper;
     logic [numStages - 1: 0] nextMemAddress1, nextMemAddress2;
+    logic [numStages - 1: 0] memoryAddressShiftReg [delay-1:0];
+    logic wrValidHelper = 0;
+
     always @(posedge clk or posedge rst) begin
         
         if (rst) begin
-            internalCounter <= 2'b00;
+            internalCounter <= 1'b0;
             init = 1'b1;
             memAddress1 <= {1'b1,  {(numStages-1){1'b0}}};
             memAddress2 <= {(numStages){1'b0}};
-        end
-        else if (done) begin //we are on clk
-            if (internalCounter == 2'b11) begin //if we reach the end of the read/write cycle --> restart it
-                internalCounter <= 2'b00;
-                nextMemAddress2 <= memAddress2 + 1'b1; //increment the lower address
-                nextMemAddress1 <= memAddress1 + 1'b1; //increment the upper address
-            end
-            else begin
-                internalCounter <= internalCounter + 1'b1; //increment the cycle counter
-            end
-
-
-            if (internalCounter == 2'b00) begin //if we are at the start of a new readwrite cycle 
+        end else if (done) begin //
+            if (internalCounter == 1'b0) begin
+                internalCounter <= 1'b1;
                 if (init == 1'b1) begin //if we are just starting the code, dont do anything
                     init <= 1'b0;
-                end
-                else begin
+                end else begin
                     if (nextMemAddress2[pivot] == 1'b1) begin //so if we reached the next pivot point on the lower bits
-                    //if our upper address has reached the maximum value
-                    //shift the pivot to the next bit
-                    // reset the lower address to 0
-                    // set the upper address to 000 1 at pivot 000 after pivot
-
                         if(nextMemAddress1 == {numStages{1'b0}}) begin //if we maxed out the memory addresses (finished this layer)
                             if (pivot == 0) begin //if weve gone throguh every single computation, restart from the top
                                 pivot = numStages-1;
@@ -67,28 +54,29 @@ module AddressGenerator (clk, rst, memAddress, wrMode, done);
                             memAddress2 <= memAddress1 + 1;
                             memAddress1 <= memAddress1 + 1 + (1'b1 << (pivot));
                         end
-                        
                     end else begin
                         memAddress2 <= memAddress2 + 1'b1; //increment the lower address
                         memAddress1 <= memAddress1 + 1'b1; //increment the upper address
-                    end  
+
+                    end
+
                 end
-
+            end else begin //internal counter is 1
+                internalCounter <= internalCounter - 1'b1; //increment the cycle counter
+                nextMemAddress1 <= memAddress1 + 1'b1; //increment the upper address
+                nextMemAddress2 <= memAddress2 + 1'b1; //increment the lower address 
             end
-
         end
-        memAddressHelper <= (internalCounter[0] == 1'b1) ? memAddress1 : memAddress2;
+        memAddressHelper <= (internalCounter == 1'b1) ? memAddress1 : memAddress2;
+        memoryAddressShiftReg <= {memAddressHelper, memoryAddressShiftReg[delay-1:1]};
+        if (memoryAddressShiftReg[1] != 0 && wrValidHelper == 1'b0) begin
+            wrValidHelper <= 1'b1;
+        end
 
     end
 
-    /*always_comb begin 
-        memAddress = (internalCounter[0] == 1'b0) ? memAddress1 : memAddress2;
-    end*/
-
-    assign wrMode = internalCounter[1];
-    assign memAddress = memAddressHelper;
-    /*assign pivot1 = pivot;
-    assign nextMemAddress2_out = nextMemAddress2;
-    assign nextMemAddress1_out = nextMemAddress1;*/
+    assign rdAddress = memAddressHelper;
+    assign wrAddress = memoryAddressShiftReg[0];
+    assign wrValid = wrValidHelper;
 
 endmodule
