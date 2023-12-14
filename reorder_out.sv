@@ -6,11 +6,11 @@ module Reorder_Out #(
 )
 (
     input clk, reset, next_pair, 
-    output logic [NUM_STAGES-1:0] wr_addr_top, wr_addr_bot, rd_addr
+    output logic [NUM_STAGES-1:0] wr_addr_top, wr_addr_bot, rd_addr, 
+    output logic in_done, out_done
 );
 
     logic [NUM_STAGES-2:0] counter; 
-    logic in_done, out_done; // TODO: maybe expose out_done?
     always_ff @(posedge clk) begin
         if (reset) begin
             counter <= 0;

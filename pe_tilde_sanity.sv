@@ -3,7 +3,7 @@
 `include "defines.v"
 `define CLK_PERIOD 2
 
-module ntt_tb();
+module pe_tilde_tb();
 
     logic clk, reset;
     logic [`DATA_SIZE_ARB-1:0] q, data_top_i, data_bot_i, twiddle_i;
