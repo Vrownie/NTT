@@ -10,8 +10,8 @@ module bit_reverse   (
 
 	logic [$clog2(`RING_SIZE)-1:0] temp_addr;
 	logic temp_ram1, temp_ram2, temp_done;
-	logic [$clog2(`RING_SIZE)-1:0] count = {$clog2(`RING_SIZE){1'b0}};
-	logic [$clog2(`RING_SIZE)-1:0] index = {$clog2(`RING_SIZE){1'b0}};
+	logic [$clog2(`RING_SIZE):0] count = {($clog2(`RING_SIZE) + 1){1'b0}};
+	logic [$clog2(`RING_SIZE):0] index = {($clog2(`RING_SIZE) + 1){1'b0}};
 	
 	always_ff @(posedge clk) begin
 		if (reset) begin

@@ -40,13 +40,6 @@ module PE(
 	.data_i(data_i), .data_o(data_i_shifted)
 );
 					
-	/*always_ff @(posedge clk) begin
-		if (start) begin
-			sel_a <= ~(sel_a);
-			sel_b <= sel_a;
-			counter <= counter + 1'b1;
-		end
-	end*/
 	
 	always_comb begin
 		/*Mux one*/
