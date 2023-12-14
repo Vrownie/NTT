@@ -76,7 +76,7 @@ module AddressGenerator (clk, rst, memAddress, wrMode);
             end
 
         end
-        memAddressHelper <= (internalCounter[0] == 1'b0) ? memAddress1 : memAddress2;
+        memAddressHelper <= (internalCounter[0] == 1'b1) ? memAddress1 : memAddress2;
 
     end
 
