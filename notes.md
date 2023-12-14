@@ -1,21 +1,22 @@
 ## Annotations for each file
-- test_generator/*: 
-- AddressGenerator: 
-- bit_reverse (Okenna): 
-- BRAM: simple BRAM implementation with an array of registers
-- CSA: 
+- test_generator/*: python stuff lol
+- AddressGenerator.v: (old)
+- AddressGenerator.sv (Sanjay): new addr gen for BRAM
+- bit_reverse (Okenna): input bit reversal
+- BRAM: (old)
+- CSA: (old)
 - defines: sets system-wide parameters
-- FA: full adder
-- intMult: 
-- ModMult: 
-- ModRed_sub: 
-- ModRed:
-- new_ntt (Okenna): NEW top level PE block
-- new_ntt.q* (Okenna): Quartus files
-- NTT2: 
-- NTTN_test: 
-- NTTN:
-- ram* (Okenna): BRAM with Intel IP
-- shift_reg (Okenna): 
-- ShiftReg: 
-- testbench (Okenna): 
+- FA: (old) 
+- intMult: (old)
+- ModMult: (old)
+- ModRed_sub: (old)
+- ModRed: (old)
+- new_ntt (Okenna): regular PE block
+- NTT2: (old)
+- NTTN_test: (old)
+- NTTN: (old)
+- pe_tilde (Young): modified PE for last stage
+- pe_tilde_test (Young): tb for modified PE
+- shift_reg (Okenna): delay reg for PE
+- ShiftReg: (old)
+- testbench (Okenna): tb for regular PE
