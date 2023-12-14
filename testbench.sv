@@ -5,10 +5,9 @@
 module ntt_tb();
 
 // Modify params.vh based on Your design and point to Your local directory below
-//`include "/classes/ece5746/projects/f23_final_project/params.vh" 
-//`include "C:/Users/oknat/Documents/Cornell_Tech/new_test/inputs.txt"
 `include "defines.v"
-
+  
+  
 
 reg clk, reset;
 reg [`DATA_SIZE_ARB-1:0] q, MULin;
