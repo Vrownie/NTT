@@ -1,0 +1,21 @@
+## Annotations for each file
+- test_generator/*: 
+- AddressGenerator: 
+- bit_reverse (Okenna): 
+- BRAM: simple BRAM implementation with an array of registers
+- CSA: 
+- defines: sets system-wide parameters
+- FA: full adder
+- intMult: 
+- ModMult: 
+- ModRed_sub: 
+- ModRed:
+- new_ntt (Okenna): NEW top level PE block
+- new_ntt.q* (Okenna): Quartus files
+- NTT2: 
+- NTTN_test: 
+- NTTN:
+- ram* (Okenna): BRAM with Intel IP
+- shift_reg (Okenna): 
+- ShiftReg: 
+- testbench (Okenna): 
