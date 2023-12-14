@@ -36,7 +36,7 @@ WINV_TXT      = open("test/WINV.txt","w")
 PC = 0 # 0: generate parameters / 1: use pre-defined parameter set
 
 # Number of Processing Elements
-P = 8
+P = 3
 
 # Generate parameters
 q       = 0
