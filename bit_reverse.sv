@@ -29,7 +29,7 @@ module bit_reverse   (
 			temp_done = 1'b1;
 	end
 	
-   	always_comb begin
+   	always @* begin
 		integer i;
 		for(i = 0; i < $clog2(`RING_SIZE); i = i + 1) begin
 			index[i] = count[$clog2(`RING_SIZE) - 1 - i];

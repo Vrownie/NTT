@@ -1,13 +1,13 @@
 `include "defines.v"
 
-module top (
+module TOP_LEVEL (
     input clk, reset, valid,
 	input [`DATA_SIZE_ARB-1:0] q, data_i, twiddle_i,
     output reg [`DATA_SIZE_ARB-1:0] data_o,
     output reg is_done
 );
 
-    `define ADDR_SIZE $clog2(`RING_SIZE)
+    //`define RING_DEPTH $clog2(`RING_SIZE);
 
     logic ram1_re, ram2_re, done;
     logic sel_a1, sel_a2, sel_ram_redundant;
@@ -19,14 +19,14 @@ module top (
     
     //Signals for to and bottom RAMs
     logic we_top, we_bot, addgen_wr; 
-    logic [`ADDR_SIZE-1:0] wr_addr_br, rd_addr_br; //Signals from bit reverse
-    logic [`ADDR_SIZE-1:0] wr_addr_addgen, rd_addr_addgen; //Signals from address generator
-    logic [`ADDR_SIZE-1:0] rd_addr, wr_addr;
+    logic [`RING_DEPTH-1:0] wr_addr_br, rd_addr_br; //Signals from bit reverse
+    logic [`RING_DEPTH-1:0] wr_addr_addgen, rd_addr_addgen; //Signals from address generator
+    logic [`RING_DEPTH-1:0] rd_addr, wr_addr;
     logic [`DATA_SIZE_ARB-1:0] top_ram_i, bot_ram_i;
 
     //Final Stage
     logic [`DATA_SIZE_ARB-1:0] last_pe_top, last_pe_bot;
-    logic [`ADDR_SIZE-1:0] reorder_wr_addr_top, reorder_wr_addr_bot, reorder_rd_addr;
+    logic [`RING_DEPTH-1:0] reorder_wr_addr_top, reorder_wr_addr_bot, reorder_rd_addr;
     logic in_done, out_done;
     logic [`DATA_SIZE_ARB-1:0] last_ram_top_o, last_ram_bot_o;
 
@@ -100,7 +100,7 @@ module top (
         .ntt_top_o(last_pe_top), .ntt_bot_o(last_pe_bot)
     );
 
-    Reorder_Out #(ADDR_SIZE) reorder(
+    Reorder_Out #(`RING_DEPTH) reorder(
         .clk(clk), .reset(reset), .next_pair(last_stage), 
         .wr_addr_top(reorder_wr_addr_top), 
         .wr_addr_bot(reorder_wr_addr_bot), 
@@ -112,20 +112,20 @@ module top (
     BRAM #(`DATA_SIZE_ARB, `RING_SIZE/2) 
     last_ram_top(
         .clk(clk), .wen(1'b1),
-        .waddr(reorder_wr_addr_top[`ADDR_SIZE-2:0]), .din(last_pe_top),
-        .raddr(reorder_rd_addr[`ADDR_SIZE-2:0]), .dout(top_ram_o)
+        .waddr(reorder_wr_addr_top[`RING_DEPTH-2:0]), .din(last_pe_top),
+        .raddr(reorder_rd_addr[`RING_DEPTH-2:0]), .dout(top_ram_o)
     );
 
     BRAM #(`DATA_SIZE_ARB, `RING_SIZE/2) 
     last_ram_bot(
         .clk(clk), .wen(1'b1),
-        .waddr(reorder_wr_addr_bot[`ADDR_SIZE-2:0]), .din(last_pe_bot),
-        .raddr(reorder_rd_addr[`ADDR_SIZE-2:0]), .dout(bot_ram_o)
+        .waddr(reorder_wr_addr_bot[`RING_DEPTH-2:0]), .din(last_pe_bot),
+        .raddr(reorder_rd_addr[`RING_DEPTH-2:0]), .dout(bot_ram_o)
     );
 
     // mux out of 2 BRAMs
     always @* begin
-        if (reorder_rd_addr[`ADDR_SIZE-1]) begin
+        if (reorder_rd_addr[`RING_DEPTH-1]) begin
             data_o = bot_ram_o;
         end else begin
             data_o = top_ram_o;

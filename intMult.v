@@ -44,7 +44,7 @@ genvar i_gen_loop,m_gen_loop;
 
 generate
   for(i_gen_loop=0; i_gen_loop < `GENERIC; i_gen_loop=i_gen_loop+1)
-  begin
+  begin : loop
 	always @(*) begin
 	   first_index_dsp [i_gen_loop] = (A >> (i_gen_loop*16));
 	   second_index_dsp[i_gen_loop] = (B >> (i_gen_loop*16));

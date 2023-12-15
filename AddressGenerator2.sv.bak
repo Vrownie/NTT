@@ -1,4 +1,4 @@
-module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid, last_stage);
+module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid, last_statge);
     parameter numStages = 8; //number of log2(Ring Size) of inputs
     localparam delay = 11;
     input clk;
@@ -25,19 +25,17 @@ module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid, last_st
         if (pivot == 1)
             last_stage = 1'b1;
         else
-            last_stage = 1'b0;
+            last_statge = 1'b0;
     end
-	 
-	 integer k;
     
-    always @(posedge clk ) begin //or posedge rst or posedge internalCounter) begin
+    always @(posedge clk or posedge rst) begin
         
         if (rst) begin
             internalCounter <= 1'b0;
             init = 1'b1;
             memAddress1 <= {1'b1,  {(numStages-1){1'b0}}};
             memAddress2 <= {(numStages){1'b0}};
-        end else if (done == 1'b1) begin //
+        end else if (done) begin //
             if (internalCounter == 1'b0) begin
                 internalCounter <= 1'b1;
                 if (init == 1'b1) begin //if we are just starting the code, dont do anything
@@ -79,13 +77,8 @@ module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid, last_st
             end
         end
         memAddressHelper <= (internalCounter == 1'b1) ? memAddress1 : memAddress2;
-        memoryAddressShiftReg[numStages-1] <= memAddressHelper;
-        
-		  for(k=1; k<numStages; k=k+1) begin: bit_shift
-				memoryAddressShiftReg[k-1] <= memoryAddressShiftReg[k];
-			end
-		  
-		  if (memoryAddressShiftReg[1] != 0 && wrValidHelper == 1'b0) begin
+        memoryAddressShiftReg <= {memAddressHelper, memoryAddressShiftReg[delay-1:1]};
+        if (memoryAddressShiftReg[1] != 0 && wrValidHelper == 1'b0) begin
             wrValidHelper <= 1'b1;
         end
 

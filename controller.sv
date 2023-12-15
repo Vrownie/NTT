@@ -26,7 +26,7 @@ module contoller(
             current_state <= next_state;
     end
 
-    always_comb begin
+    always @* begin
         case (current_state)
             idle: begin
                 temp_sel_a = 1'b1;

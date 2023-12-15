@@ -26,6 +26,9 @@ limitations under the License.
 `define RING_SIZE       8
 `define PE_NUMBER       1
 
+`define ADDR_SIZE ($clog2(`RING_SIZE));
+
+
 // ------------------------------------------------
 // Parameters for integer multiplication
 

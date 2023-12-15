@@ -29,8 +29,8 @@ assign C_reg[0][(2*`DATA_SIZE_ARB)-1:0] = P[(2*`DATA_SIZE_ARB)-1:0];
 // ------------------------------------------------------------- XY+Z+Cin operations (except for the last one)
 genvar i_gen_loop;
 generate
-  for(i_gen_loop=0; i_gen_loop < (`L_SIZE-1); i_gen_loop=i_gen_loop+1)
-  begin
+  for(i_gen_loop=0; i_gen_loop < (`L_SIZE-1); i_gen_loop=i_gen_loop+1) 
+  begin : loop
 		ModRed_sub     #(.CURR_DATA((2*`DATA_SIZE_ARB)-(i_gen_loop  )*(`W_SIZE-1)),
 						 .NEXT_DATA((2*`DATA_SIZE_ARB)-(i_gen_loop+1)*(`W_SIZE-1)))
 		           mrs  (.clk(clk),
