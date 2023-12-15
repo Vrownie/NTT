@@ -1,5 +1,5 @@
 module AddressGenerator (clk, rst, memAddress, wrMode, done);
-    parameter numStages = 8; //number of stages in the pipeline
+    parameter numStages = 1024; //number of stages in the pipeline
     input clk;
     input rst;
     input done;

@@ -11,7 +11,7 @@ module TOP_LEVEL (
 
     logic ram1_re, ram2_re, done;
     logic sel_a1, sel_a2, sel_ram_redundant;
-    logic [`DATA_SIZE_ARB-1:0] bit_rev_o, top_ram_o, bot_ram_o;
+    logic [`DATA_SIZE_ARB-1:0] bit_rev_o, top_ram_o, top_ram_1, bot_ram_o, bot_ram_1;
     logic [`DATA_SIZE_ARB-1:0] pe1_o, pe2_o;
     logic [11:0] count = 0;
     logic last_stage;
@@ -113,22 +113,22 @@ module TOP_LEVEL (
     last_ram_top(
         .clk(clk), .wen(1'b1),
         .waddr(reorder_wr_addr_top[`RING_DEPTH-2:0]), .din(last_pe_top),
-        .raddr(reorder_rd_addr[`RING_DEPTH-2:0]), .dout(top_ram_o)
+        .raddr(reorder_rd_addr[`RING_DEPTH-2:0]), .dout(top_ram_1)
     );
 
     BRAM #(`DATA_SIZE_ARB, `RING_SIZE/2) 
     last_ram_bot(
         .clk(clk), .wen(1'b1),
         .waddr(reorder_wr_addr_bot[`RING_DEPTH-2:0]), .din(last_pe_bot),
-        .raddr(reorder_rd_addr[`RING_DEPTH-2:0]), .dout(bot_ram_o)
+        .raddr(reorder_rd_addr[`RING_DEPTH-2:0]), .dout(bot_ram_1)
     );
 
     // mux out of 2 BRAMs
     always @* begin
         if (reorder_rd_addr[`RING_DEPTH-1]) begin
-            data_o = bot_ram_o;
+            data_o = bot_ram_1;
         end else begin
-            data_o = top_ram_o;
+            data_o = top_ram_1;
         end
     end
 

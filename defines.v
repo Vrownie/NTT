@@ -23,7 +23,7 @@ limitations under the License.
 // -- B: PE_NUMBER
 
 `define DATA_SIZE_ARB   13
-`define RING_SIZE       8
+`define RING_SIZE       1024
 `define PE_NUMBER       1
 
 `define ADDR_SIZE ($clog2(`RING_SIZE));
