@@ -4,6 +4,3 @@ test/*
 __pycache__/
 *.py[cod]
 *$py.class
-
-vsim.wlf
-wlft3qamsy
