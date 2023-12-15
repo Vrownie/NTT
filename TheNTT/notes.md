@@ -1,0 +1,14 @@
+## Annotations for each file
+- AddressGenerator (Sanjay): old addr gen (not used)
+- AddressGenerator2 (Sanjay): new addr gen
+- bit_reverse (Okenna): input bit reversal
+- controller (Okenna): controller for regular PEs
+- new_ntt (Okenna): regular PE block
+- pe_tilde_sanity (Young): tb for modified PE
+- pe_tilde (Young): modified PE for last stage
+- reorder_out_test (Young): tb for reordering module
+- reorder_out (Young): reordering controller for out cache
+- shift_reg (Okenna): delay regs for PEs
+- testbench (Okenna): tb for regular PEs
+- TOP_LEVEL (team): top level TheNTT module
+- twiddleAddressGenerator (Sanjay): twiddle addr gen
