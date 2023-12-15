@@ -1,5 +1,5 @@
-module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid);
-    parameter numStages = 8; //number of stages in the pipeline
+module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid, last_statge);
+    parameter numStages = 8; //number of log2(Ring Size) of inputs
     localparam delay = 11;
     input clk;
     input rst;
@@ -7,8 +7,10 @@ module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid);
     output reg [numStages - 1:0] rdAddress; //address in memory being modified
     output reg [numStages - 1:0] wrAddress;
     output reg wrValid;
+    output reg last_stage;
     //output wrMode;
 
+    logic last_stage_temp;
     logic internalCounter = 1'b0;
     int pivot = numStages-1;
     logic [numStages - 1: 0] memAddress1 = {1'b1,  {(numStages-1){1'b0}}}; //create the upper mem address
@@ -19,6 +21,13 @@ module AddressGenerator2 (clk, rst, done, rdAddress, wrAddress, wrValid);
     logic [numStages - 1: 0] memoryAddressShiftReg [delay-1:0];
     logic wrValidHelper = 0;
 
+    always_comb begin
+        if (pivot == 1)
+            last_stage = 1'b1;
+        else
+            last_statge = 1'b0;
+    end
+    
     always @(posedge clk or posedge rst) begin
         
         if (rst) begin

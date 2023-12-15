@@ -2,18 +2,27 @@
 
 module top (
     input clk, reset, valid,
-	input [`DATA_SIZE_ARB-1:0] q, data_i,
+	input [`DATA_SIZE_ARB-1:0] q, data_i, twiddle_i,
     input [`DATA_SIZE_ARB-1:0] data_o,
 );
 
     logic ram1_re, ram2_re, done;
-    logic sel_a1, sel_a2, sel_b1, sel_b2;
+    logic sel_a1, sel_a2, sel_ram_redundant;
     logic [`DATA_SIZE_ARB-1:0] bit_rev_o, top_ram_o, bot_ram_o;
-    logic [`DATA_SIZE_ARB-1:0] pe1_o, data_top;
-    logic we_top, we_bot; //Write enable for to and bottom RAMs
-    logic [$clog2(`RING_SIZE)-1:0] wraddr_top, wraddr_bot;
-    logic [$clog2(`RING_SIZE)-1:0] addr_rd_top, addr_wr_top;
+    logic [`DATA_SIZE_ARB-1:0] pe1_o, pe2_0;
+    logic [11:0] count = 0;
+    logic last_stage;
 
+    
+    //Signals for to and bottom RAMs
+    logic we_top, we_bot, addgen_wr; 
+    logic [$clog2(`RING_SIZE)-1:0] wr_addr_br, rd_addr_br; //Signals from bit reverse
+    logic [$clog2(`RING_SIZE)-1:0] wr_addr_addgen, rd_addr_addgen; //Signals from address generator
+    logic [$clog2(`RING_SIZE)-1:0] rd_addr, wr_addr;
+    logic [`DATA_SIZE_ARB-1:0] top_ram_i, bot_ram_i;
+
+    //Final Stage
+    logic [`DATA_SIZE_ARB-1:0] last_pe_top, last_pe_bot;
 
     bit_reverse BR (
         .clk(clk), .reset(reset), .valid(valid),
@@ -22,39 +31,83 @@ module top (
         .addr(br_addr)
     );
 
-    module AddressGenerator_s (.clk(clk), .rst(rst), .memAddress()., wrMode);
+    AddressGenerator2 AddrGen(.clk(clk), .rst(reset), done.(done), .rdAddress(rd_addr_addgen),
+                             .wrAddress(wr_addr_addgen), .wrValid(addgen_wr), .last_statge());
 
+    contoller control( 
+        .clk(clk), .reset(reset),
+        .start(done), .sel_a(sel_a1), .sel_b(sel_a2), 
+        .sel_ram(sel_ram_redundant), .stage(count)
+    );
 
     always @* begin
         if (!done) begin
-            wraddr_top = br_addr;
+            wr_addr = wr_addr_br;
             we_top = ram1_re;            
-
-            wraddr_bot = br_addr;
-            we_bot = ram2_re;    
-            
-            data_top = bit_rev_o;   
+            we_bot = ram2_re;   
+            top_ram_i = bit_rev_o;
+            bot_ram_i = bit_rev_o;
         end
         else begin
-            wr_top = br;
-            wr_bot = ram2_re;
-            we_bot
+            wr_addr = wr_addr_addgen;
+            we_top = addgen_wr;            
+            we_bot = addgen_wr;
+            top_ram_i = pe1_o;
+            bot_ram_i = pe2_o;
         end
     end
+
+    //PE and Block RAM first Pair
+    BRAM #(`DATA_SIZE_ARB, `RING_SIZE/2) 
+    top_ram(
+        .clk(clk), .wen(we_top),
+        .waddr(wr_addr), .din(top_ram_i),
+        .raddr(rd_addr_addgen), .dout(top_ram_o)
+    );
 
     PE PE1 ( 
         .clk(clk), .reset(reset),
         .start(done), .sel_a(sel_a1), .sel_b(sel_b1),
         .q(q), .data_i(top_ram_o),
-        .twiddle_i(twiddle_i), .ntt_o(pe1_o)
+        .twiddle_i(twiddle_o), .ntt_o(pe1_o)
     );
 
-    BRAM #(DATA_SIZE_ARB, RING_SIZE/2) 
-    top_ram
-           (.clk(clk), .wen(we_top),
-            .waddr(wraddr_top), .din(),
-            .raddr(), .dout(top_ram_o)
+    //PE and Block RAM second Pair
+    BRAM #(`DATA_SIZE_ARB, `RING_SIZE/2) 
+    bot_ram(
+        .clk(clk), .wen(we_top),
+        .waddr(wr_addr), .din(bot_ram_i),
+        .raddr(rd_addr_addgen), .dout(bot_ram_o)
     );
+
+    PE PE2 ( 
+        .clk(clk), .reset(reset),
+        .start(done), .sel_a(sel_a1), .sel_b(sel_b1),
+        .q(q), .data_i(bot_ram_o),
+        .twiddle_i(twiddle_o), .ntt_o(pe2_o)
+    );
+
+    //Final Stage
+    PE_Tilde final_PE( 
+        .clk(clk), .reset(reset),
+        .q(q), .data_top_i(pe1_o), .data_bot_i(pe2_o), 
+        .ntt_top_o(last_pe_top), ntt_bot_o(last_pe_bot)
+    );
+
+    Reorder_Out #(3)
+    last_ram(
+        .clk(clk), .reset(reset), .next_pair(last_stage), 
+        .wr_addr_top(), .wr_addr_bot(), .rd_addr(), 
+        .in_done(), .out_done()
+    );
+
+    BRAM #(`DATA_SIZE_ARB, `RING_SIZE/2) 
+    last_ram(
+        .clk(clk), .wen( ),
+        .waddr( ), .din( ),
+        .raddr(rd_addr_addgen), .dout(bot_ram_o)
+    );
+
     
 endmodule
 
